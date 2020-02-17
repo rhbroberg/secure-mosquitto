@@ -1,0 +1,30 @@
+version: '3.7'
+
+services:
+  mqtt:
+    image: secure-mosquitto
+    container_name: mqtt
+    ports:
+      - 1883:1883
+      - 8883:8883
+    volumes:
+      - ./config:/mosquitto/config
+      - ./trigger:/tmp/trigger
+      - ./le:/etc/letsencrypt
+    restart: always
+  certbot:
+    image: certbot
+    container_name: certbot
+    environment:
+      - DOMAIN=mqtt.brobasino.onthegrid.net
+      - EMAIL=rhbroberg@gmail.com
+      - DRYRUN=true
+    volumes:
+      - ./le:/etc/letsencrypt
+      - ./trigger:/tmp/trigger
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+
+

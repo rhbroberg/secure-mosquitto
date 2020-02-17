@@ -1,12 +1,12 @@
-DOMAIN		= brobasino.onthegrid.net
-PSK_HINT	= mymqtt
-PASSWORD	= password
+DOMAIN		= mqtt.brobasino.onthegrid.net
+PSK_HINT	= $(DOMAIN)
 
-docker-image:	config/mosquitto.conf
-	docker build -t secure-mosquitto .
+all:
+	@echo choose do-self-signed or do-le
 
-clean:
-	rm -rf mosquitto templates/mosquitto.conf certs config
+do-self-signed:	config/config.d/self-certs.conf config/mosquitto.conf self-signed-certs
+
+do-le:	config/config.d/le-certs.conf config/mosquitto.conf
 
 config:
 	@mkdir -p $@
@@ -20,13 +20,14 @@ templates/mosquitto.conf:
 config/mosquitto.conf:	config templates/mosquitto.conf
 	@perl -p -e 's|^#user .*|user mosquitto|g; s|^#allow_anonymous.*|allow_anonymous true|g; s|^#include_dir.*|include_dir /mosquitto/config/config.d|g' < templates/mosquitto.conf > $@
 
-do-self-signed:	config/config.d/certs.conf self-signed-certs
+config/config.d/self-certs.conf:	config/config.d templates/self-certs.conf
+	@perl -p -e s'/DOMAIN/$(DOMAIN)/g' < templates/self-certs.conf > $@
 
-config/config.d/certs.conf:	config/config.d templates/certs.conf
-	@perl -p -e s'/DOMAIN/$(DOMAIN)/g' < templates/certs.conf > config/config.d/certs.conf
+config/config.d/le-certs.conf:	config/config.d templates/le-certs.conf
+	@perl -p -e s'/DOMAIN/$(DOMAIN)/g' < templates/le-certs.conf > $@
 
 config/config.d/psk.conf:	config/config.d templates/psk.conf
-	@perl -p -e s'/PSK_HINT/$(PSK_HINT)/g' < templates/psk.conf > config/config.d/psk.conf
+	@perl -p -e s'/PSK_HINT/$(PSK_HINT)/g' < templates/psk.conf > $@
 
 certs:
 	@mkdir -p $@
@@ -61,6 +62,10 @@ SERVER_CERT_FILES	= ca.crt server.crt server.key
 MQTT_CERTS		= $(addprefix config/certs/,$(SERVER_CERT_FILES))
 
 server-certs:	config/certs $(MQTT_CERTS)
+	@touch trigger
 
 $(MQTT_CERTS):	config/certs/%: certs/%
 	install -m 644 $< $@
+
+clean:
+	rm -rf mosquitto templates/mosquitto.conf certs config certbot-image mosquitto-image
