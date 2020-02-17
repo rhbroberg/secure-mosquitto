@@ -1,13 +1,16 @@
-DOMAIN		= mqtt.brobasino.onthegrid.net
+include .env
+
 PSK_HINT	= $(DOMAIN)
 MOS_CONFIG_DIR	= volumes/mosquitto/config
 
 all:
 	@echo choose do-self-signed or do-le
 
-do-self-signed:	$(MOS_CONFIG_DIR)/config.d/self-certs.conf $(MOS_CONFIG_DIR)/mosquitto.conf self-signed-certs
+do-self-signed:	$(MOS_CONFIG_DIR)/config.d/self-certs.conf $(MOS_CONFIG_DIR)/mosquitto.conf $(MOS_CONFIG_DIR)/config.d/logging.conf self-signed-certs
 
-do-le:	$(MOS_CONFIG_DIR)/config.d/le-certs.conf $(MOS_CONFIG_DIR)/mosquitto.conf
+do-le:	$(MOS_CONFIG_DIR)/config.d/le-certs.conf $(MOS_CONFIG_DIR)/mosquitto.conf $(MOS_CONFIG_DIR)/config.d/logging.conf
+
+do-cleartext:	$(MOS_CONFIG_DIR)/mosquitto.conf $(MOS_CONFIG_DIR)/config.d/logging.conf
 
 config:
 	@mkdir -p $@
@@ -20,6 +23,9 @@ templates/mosquitto.conf:
 
 $(MOS_CONFIG_DIR)/mosquitto.conf:	config templates/mosquitto.conf
 	@perl -p -e 's|^#user .*|user mosquitto|g; s|^#allow_anonymous.*|allow_anonymous true|g; s|^#include_dir.*|include_dir /mosquitto/config/config.d|g' < templates/mosquitto.conf > $@
+
+$(MOS_CONFIG_DIR)/config.d/logging.conf:	$(MOS_CONFIG_DIR)/config.d templates/logging.conf
+	@perl -p -e s'/DOMAIN/$(DOMAIN)/g' < templates/logging.conf > $@
 
 $(MOS_CONFIG_DIR)/config.d/self-certs.conf:	$(MOS_CONFIG_DIR)/config.d templates/self-certs.conf
 	@perl -p -e s'/DOMAIN/$(DOMAIN)/g' < templates/self-certs.conf > $@

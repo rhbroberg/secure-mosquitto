@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 # this design is only necessary due to mosquitto not (yet) supporting the idea of certificates
 # changing on disk, and being able to re-read them upon a signal (or even better being able to detect the change)
 # an open ticket exists for this behavior.  if that behavior exists someday then this container would simply
@@ -14,13 +16,9 @@ if [ -z "$TRIGGER_FILE" ] ; then
     TRIGGER_FILE=/tmp/trigger
 fi
 
-set -e
-
-# don't start mosquitto until trigger exists
-if [ ! -f $TRIGGER_FILE ]; then
-    echo "Initial certificate not yet generated, will try again shortly"
-    sleep 5
-fi
+# instead the container should be run as the mosquitto user!
+chown mosquitto /mosquitto/log
+chown mosquitto /mosquitto/data
 
 while `true`; do
     $@ &

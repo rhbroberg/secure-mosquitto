@@ -2,17 +2,15 @@
 
 set -e
 
-#DOMAIN=mqtt.brobasino.onthegrid.net
-#EMAIL=rhbroberg@gmail.com
 #DRYRUN=x
 CERT_LOCATION=/etc/letsencrypt/live/$DOMAIN
 CHECK_DELAY=1d
-#CHECK_DELAY=120s
 
 if [ -n "$DRYRUN" ]; then
     echo "Warning: in dryrun mode, certificate isn't fully functional"
     DRYRUN_RETRIEVE_ARGS="--staging --test-cert $EXTRA_RETRIEVE_ARGS"
     DRYRUN_RENEW_ARGS="--dry-run $EXTRA_RENEW_ARGS"
+    CHECK_DELAY=120s
 fi
 
 while `true` ; do

@@ -9,15 +9,17 @@ services:
       - 8883:8883
     volumes:
       - ./volumes/mosquitto/config:/mosquitto/config
+      - ./volumes/mosquitto/log:/mosquitto/log
+      - ./volumes/mosquitto/data:/mosquitto/data
       - ./volumes/trigger:/tmp/trigger
       - ./volumes/letsencrypt:/etc/letsencrypt
-    restart: always
+    restart: unless-stopped
   certbot:
     image: certbot
     container_name: certbot
     environment:
-      - DOMAIN=mqtt.brobasino.onthegrid.net
-      - EMAIL=rhbroberg@gmail.com
+      - DOMAIN=$DOMAIN
+      - EMAIL=$EMAIL
 #      - DRYRUN=true
     volumes:
       - ./volumes/letsencrypt:/etc/letsencrypt
