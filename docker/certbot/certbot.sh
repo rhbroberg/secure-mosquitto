@@ -2,14 +2,14 @@
 
 set -e
 
-DOMAIN=mqtt.brobasino.onthegrid.net
-EMAIL=rhbroberg@gmail.com
+#DOMAIN=mqtt.brobasino.onthegrid.net
+#EMAIL=rhbroberg@gmail.com
+#DRYRUN=x
 CERT_LOCATION=/etc/letsencrypt/live/$DOMAIN
 CHECK_DELAY=1d
 #CHECK_DELAY=120s
-#DRYRUN=x
 
-if [ -n "DRYRUN" ]; then
+if [ -n "$DRYRUN" ]; then
     DRYRUN_RETRIEVE_ARGS="--staging --test-cert $EXTRA_RETRIEVE_ARGS"
     DRYRUN_RENEW_ARGS="--dry-run $EXTRA_RENEW_ARGS"
 fi

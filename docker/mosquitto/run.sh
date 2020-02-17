@@ -15,7 +15,6 @@ if [ -z "$TRIGGER_FILE" ] ; then
 fi
 
 set -e
-set -x
 
 # don't start mosquitto until trigger exists
 if [ ! -f $TRIGGER_FILE ]; then

@@ -8,9 +8,9 @@ services:
       - 1883:1883
       - 8883:8883
     volumes:
-      - ./config:/mosquitto/config
-      - ./trigger:/tmp/trigger
-      - ./le:/etc/letsencrypt
+      - ./volumes/mosquitto/config:/mosquitto/config
+      - ./volumes/trigger:/tmp/trigger
+      - ./volumes/letsencrypt:/etc/letsencrypt
     restart: always
   certbot:
     image: certbot
@@ -18,10 +18,10 @@ services:
     environment:
       - DOMAIN=mqtt.brobasino.onthegrid.net
       - EMAIL=rhbroberg@gmail.com
-      - DRYRUN=true
+#      - DRYRUN=true
     volumes:
-      - ./le:/etc/letsencrypt
-      - ./trigger:/tmp/trigger
+      - ./volumes/letsencrypt:/etc/letsencrypt
+      - ./volumes/trigger:/tmp/trigger
     ports:
       - 80:80
       - 443:443
