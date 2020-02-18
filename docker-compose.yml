@@ -13,6 +13,10 @@ services:
       - ./volumes/mosquitto/data:/mosquitto/data
       - ./volumes/trigger:/tmp/trigger
       - ./volumes/letsencrypt:/etc/letsencrypt
+    logging:
+      options:
+        max-size: "4m"
+        max-file: "10"
     restart: unless-stopped
   certbot:
     image: certbot
@@ -27,6 +31,10 @@ services:
     ports:
       - 80:80
       - 443:443
+    logging:
+      options:
+        max-size: "1m"
+        max-file: "10"
     restart: unless-stopped
 
 

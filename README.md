@@ -14,7 +14,7 @@ Building.  My DOMAIN is called ubuntu-18-04-06.brobasino.lan.  Update the .env f
 
 For self-signed cert:
 
-    make do-self-signed
+    make do-self-signed DOMAIN=$DOMAIN
     docker run -d --name secure-mosquitto -p 1883:1883 -p 8883:8883 -v `pwd`/volumes/mosquitto/config:/mosquitto/config -v `pwd`/volumes/mosquitto/log:/mosquitto/log -v `pwd`/trigger:/tmp/trigger secure-mosquitto
 
 Test with:
@@ -54,3 +54,14 @@ Test with:
      mosquitto_sub -h ubuntu-18-04-06.brobasino.lan -t /foo -p 1883 &
      mosquitto_pub -h ubuntu-18-04-06.brobasino.lan -t /foo -m "foobar" -p 1883
 
+Random musings:
+     useful configuration options
+	    - 'psk_hint foo'
+	    - 'psk_file /path/to/file'
+     	    - 'queue_qos0_messages true' -- allow durable client subscription to receive published messages even if only qos=0
+	    - 'persistence true'
+	    - 'persistence_location /path/to/file'
+	    - 'persistent_client_expiration duration'
+	    - 'autosave_interval interval' (interpreted as seconds or count, based on true or false below)
+	    - 'autosave_on_changes true'
+	    

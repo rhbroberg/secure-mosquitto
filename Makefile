@@ -12,16 +12,13 @@ do-le:	$(MOS_CONFIG_DIR)/config.d/le-certs.conf $(MOS_CONFIG_DIR)/mosquitto.conf
 
 do-cleartext:	$(MOS_CONFIG_DIR)/mosquitto.conf $(MOS_CONFIG_DIR)/config.d/logging.conf
 
-config:
-	@mkdir -p $@
-
 $(MOS_CONFIG_DIR)/config.d:
 	@mkdir -p $@
 
 templates/mosquitto.conf:
 	wget -q -O templates/mosquitto.conf https://raw.githubusercontent.com/eclipse/mosquitto/master/mosquitto.conf
 
-$(MOS_CONFIG_DIR)/mosquitto.conf:	config templates/mosquitto.conf
+$(MOS_CONFIG_DIR)/mosquitto.conf:	templates/mosquitto.conf
 	@perl -p -e 's|^#user .*|user mosquitto|g; s|^#allow_anonymous.*|allow_anonymous true|g; s|^#include_dir.*|include_dir /mosquitto/config/config.d|g' < templates/mosquitto.conf > $@
 
 $(MOS_CONFIG_DIR)/config.d/logging.conf:	$(MOS_CONFIG_DIR)/config.d templates/logging.conf
@@ -69,10 +66,10 @@ SERVER_CERT_FILES	= ca.crt server.crt server.key
 MQTT_CERTS		= $(addprefix $(MOS_CONFIG_DIR)/certs/,$(SERVER_CERT_FILES))
 
 server-certs:	$(MOS_CONFIG_DIR)/certs $(MQTT_CERTS)
-	@touch trigger
+	@touch $@
 
 $(MQTT_CERTS):	$(MOS_CONFIG_DIR)/certs/%: certs/%
 	install -m 644 $< $@
 
 clean:
-	rm -rf mosquitto templates/mosquitto.conf certs config certbot-image mosquitto-image
+	rm -rf mosquitto templates/mosquitto.conf certs certbot-image mosquitto-image server-certs
